@@ -1,3 +1,5 @@
+var magnification = 3;
+
 function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -100,13 +102,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const magnifyingGlass = document.getElementById('magnifying-glass');
     const magnifiedCtx = magnifyingGlass.getContext('2d');
     const magnifiedSize = 200;
-    const magnification = 3; // Adjust the magnification level as needed
 
     // Set the size of the magnified canvas
     magnifyingGlass.width = magnifiedSize;
     magnifyingGlass.height = magnifiedSize;
 
-    canvas.addEventListener('mousemove', (event) => {
+    function updateMagnifyingGlass(event){
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
@@ -122,9 +123,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
         magnifiedCtx.drawImage(canvas, x - magnifiedSize / (2 * magnification), y - magnifiedSize / (2 * magnification), magnifiedSize / magnification, magnifiedSize / magnification, 0, 0, magnifiedSize, magnifiedSize);
         
         magnifyingGlass.style.backgroundPosition = `-${x * magnification}px -${y * magnification}px`;
+    }
+
+    canvas.addEventListener('mousemove', (event) => {
+        updateMagnifyingGlass(event)
     });
 
     canvas.addEventListener('mouseout', () => {
         magnifyingGlass.style.visibility = 'hidden';
+    });
+
+    window.addEventListener('wheel', function(event) {
+        magnification += event.deltaY / 280;
+        updateMagnifyingGlass(event)
     });
 });
